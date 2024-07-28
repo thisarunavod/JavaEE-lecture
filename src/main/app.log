@@ -1,0 +1,6 @@
+11:21:42.852 [RMI TCP Connection(2)-127.0.0.1] INFO  l.i.gdse68.studentmanagment.Student - Init method invoked
+11:21:43.231 [RMI TCP Connection(2)-127.0.0.1] INFO  l.i.gdse68.studentmanagment.Student - Connection initialized
+11:24:05.753 [RMI TCP Connection(2)-127.0.0.1] INFO  l.i.gdse68.studentmanagment.Student - Init method invoked
+11:24:06.117 [RMI TCP Connection(2)-127.0.0.1] INFO  l.i.gdse68.studentmanagment.Student - Connection initialized
+11:27:47.090 [RMI TCP Connection(2)-127.0.0.1] INFO  l.i.gdse68.studentmanagment.Student - Init method invoked
+11:27:47.472 [RMI TCP Connection(2)-127.0.0.1] INFO  l.i.gdse68.studentmanagment.Student - Connection initialized
