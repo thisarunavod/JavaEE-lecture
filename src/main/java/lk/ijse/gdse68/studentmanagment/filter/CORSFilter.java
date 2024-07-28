@@ -21,10 +21,6 @@ public class CORSFilter extends HttpFilter {
                 res.setHeader("Access-Control-Expose-Headers","Content-Type"); //js engin access
 
 
-
-
-
-                System.out.println("thisaru");
             }
             chain.doFilter(req, res);
         }
