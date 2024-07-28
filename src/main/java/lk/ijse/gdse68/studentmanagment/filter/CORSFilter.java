@@ -24,4 +24,5 @@ public class CORSFilter extends HttpFilter {
             }
             chain.doFilter(req, res);
         }
+
 }

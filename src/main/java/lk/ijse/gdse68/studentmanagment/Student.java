@@ -2,14 +2,14 @@ package lk.ijse.gdse68.studentmanagment;
 
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
-import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lk.ijse.gdse68.studentmanagment.StudentDTO;
-import lk.ijse.gdse68.studentmanagment.Util;
+import lk.ijse.gdse68.studentmanagment.DAO.StudentDAOImpl;
+import lk.ijse.gdse68.studentmanagment.DTO.StudentDTO;
+import lk.ijse.gdse68.studentmanagment.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,8 +17,6 @@ import javax.naming.InitialContext;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 
 @WebServlet(urlPatterns = "/student",loadOnStartup = 3) /*load onstrap eken wenne --> req ekak nattn eken servlet ekak hada gannawa */
 public class Student extends HttpServlet {
@@ -123,7 +121,7 @@ public class Student extends HttpServlet {
 
         // 2024.7.14 //
 
-        try(var writer = resp.getWriter()) {
+        /*try(var writer = resp.getWriter()) {
             Jsonb  jsonb = JsonbBuilder.create();
             StudentDTO student = jsonb.fromJson(req.getReader(), StudentDTO.class);
             student.setId(Util.IdGenerate());
@@ -145,10 +143,24 @@ public class Student extends HttpServlet {
 
 
             // create response //
-            /*resp.setContentType("application/json") ;
-            jsonb.toJson(student,resp.getWriter()) ;*/
+            *//*resp.setContentType("application/json") ;
+            jsonb.toJson(student,resp.getWriter()) ;*//*
 
         } catch (Exception e) {
+            e.printStackTrace();
+        }*/
+
+        //layerd version
+        try (var writer = resp.getWriter()){
+            Jsonb jsonb = JsonbBuilder.create();
+            var studentDAOIMPL = new StudentDAOImpl();
+            StudentDTO studentDto = jsonb.fromJson(req.getReader(), StudentDTO.class);
+            studentDto.setId(Util.IdGenerate());
+            //Save data in the DB
+            writer.write(studentDAOIMPL.savaStudent(studentDto,connection));
+            resp.setStatus(HttpServletResponse.SC_CREATED);
+        }catch (Exception e){
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             e.printStackTrace();
         }
 
@@ -158,7 +170,7 @@ public class Student extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException   {
         // database eke values postman eke balanna //
-        try (var writer = resp.getWriter()){
+        /*try (var writer = resp.getWriter()){
 
             var studentID =req.getParameter("id");
             Jsonb  jsonb = JsonbBuilder.create();
@@ -184,6 +196,19 @@ public class Student extends HttpServlet {
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             e.printStackTrace();
+        }*/
+
+        // layerd version //
+
+        try(var writer = resp.getWriter()) {
+            var studentDAOImpl = new StudentDAOImpl();
+            Jsonb jsonb = JsonbBuilder.create();
+            //DB Process
+            var studentId = req.getParameter("studentId");;
+            resp.setContentType("application/json");
+            jsonb.toJson(studentDAOImpl.getStudent(studentId,connection),writer);
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
     }
@@ -191,7 +216,7 @@ public class Student extends HttpServlet {
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //To Update
-        try (var writer = resp.getWriter()){
+        /*try (var writer = resp.getWriter()){
             var studentID = req.getParameter("id");
             Jsonb jsonb = JsonbBuilder.create();
             StudentDTO dto = jsonb.fromJson(req.getReader(),StudentDTO.class);
@@ -216,8 +241,24 @@ public class Student extends HttpServlet {
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             e.printStackTrace();
-        }
+        }*/
 
+        //Layerd type //
+
+        try (var writer = resp.getWriter()) {
+            var studentDAOImpl = new StudentDAOImpl();
+            var studentId = req.getParameter("id");
+            Jsonb jsonb = JsonbBuilder.create();
+            StudentDTO studentDTO = jsonb.fromJson(req.getReader(), StudentDTO.class);
+            if(studentDAOImpl.updateStudent(studentId,studentDTO,connection)){
+                resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            }else {
+                writer.write("Update failed");
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
 
 
     }
@@ -226,7 +267,7 @@ public class Student extends HttpServlet {
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
         // To Delete
-        try (var writer = resp.getWriter()){
+        /*try (var writer = resp.getWriter()){
             var studentID = req.getParameter("id");
 
             //SQL Process
@@ -245,7 +286,25 @@ public class Student extends HttpServlet {
         } catch (Exception e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             e.printStackTrace();
+        }*/
+
+        //Layerd type //
+        try (var writer = resp.getWriter()) {
+            var studentId = req.getParameter("id");
+            var studentDAOImpl = new StudentDAOImpl();
+            if(studentDAOImpl.deleteStudent(studentId,connection)){
+                resp.setStatus(HttpServletResponse.SC_NO_CONTENT);
+            }else {
+                writer.write("Delete failed");
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
+
+
+
+
 
     }
 
